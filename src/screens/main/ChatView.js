@@ -1,42 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {Avatar} from 'react-native-elements';
+import {View, StyleSheet, SafeAreaView, Image} from 'react-native';
 import {
   responsiveFontSize,
   responsiveHeight,
   responsiveWidth,
 } from 'react-native-responsive-dimensions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {goHome} from '../../navigation/navigation';
-import {GiftedChat} from 'react-native-gifted-chat';
+import {GiftedChat, Send} from 'react-native-gifted-chat';
 import firestore from '@react-native-firebase/firestore';
 import {connect} from 'react-redux';
-import {Navigation} from 'react-native-navigation';
+import {launchImageLibrary} from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
+import colors from '../../common/theme/colors';
 
-const ChatView = (props) => {
-  // const p = props;
-  // Navigation.mergeOptions(props.componentId, {
-  //   topBar: {
-  //     rightButtons: {
-  //       id: 'custom',
-  //       component: {
-  //         name: 'BntEditProfile',
-  //         passProps: {
-  //           name: p.title,
-  //           avatar: p.avatar,
-  //           status: p.status,
-  //           navigation: p.componentId,
-  //         },
-  //       },
-  //     },
-  //   },
-  // });
+const ChatView = props => {
 
   const [messages, setMessages] = useState([]);
+  const [image, setImage] = useState('');
   const userId = props.userId;
-  // console.log("sendTo",userId)
   const myid = props.todos;
-  // console.log("sendBy",myid)
   useEffect(() => {
     const docid = myid > userId ? userId + '-' + myid : myid + '-' + userId;
     const messageRef = firestore()
@@ -69,6 +51,33 @@ const ChatView = (props) => {
     };
   }, []);
 
+  const pickImageAndUpload = () => {
+    launchImageLibrary({quality: 0.5}, fileobj => {
+     
+      const fileUpLoad = fileobj.assets[0].uri;
+      const uploadTask = storage()
+        .ref()
+        .child(`/messageImage/${Date.now()}`)
+        .putFile(fileUpLoad);
+      uploadTask.on(
+        'state_changed',
+        snapshot => {
+          var progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          if (progress == 100) alert('image uploaded');
+        },
+        error => {
+          alert('error uploading image');
+        },
+        () => {
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            setImage(downloadURL);
+          });
+        },
+      );
+    });
+  };
+
   const onSend = messageArray => {
     const msg = messageArray[0];
     const mymsg = {
@@ -76,6 +85,7 @@ const ChatView = (props) => {
       sentBy: myid,
       sentTo: userId,
       createdAt: new Date(),
+      image: image,
     };
     setMessages(previousMessages => GiftedChat.append(previousMessages, mymsg));
     const docid = myid > userId ? userId + '-' + myid : myid + '-' + userId;
@@ -85,17 +95,79 @@ const ChatView = (props) => {
       .doc(docid)
       .collection('messages')
       .add({...mymsg, createdAt: firestore.FieldValue.serverTimestamp()});
+    setImage('');
+  };
+
+  //Where onSend is the function use to onsend;
+  const customSendPress = (text, onSend) => {
+    if (image && !text && onSend) {
+      onSend({text: text.trim()}, true);
+    } else if (text && onSend) {
+      onSend({text: text.trim()}, true);
+      0;
+    } else {
+      return false;
+    }
+  };
+
+  const customSend = ({onSend, text, sendButtonProps, ...sendProps}) => {
+    return (
+      <Send
+        {...sendProps}
+        textStyle={style.sendButton}
+        sendButtonProps={{
+          ...sendButtonProps,
+          onPress: () => customSendPress(text, onSend),
+        }}
+      />
+    );
+  };
+
+  const handleDelImg = () => {
+    setImage('');
   };
   return (
-    <View style={style.root}>
+    <SafeAreaView style={style.root}>
       <GiftedChat
+        alwaysShowSend="true"
         messages={messages}
         onSend={text => onSend(text)}
         user={{
           _id: myid,
         }}
-      />
-    </View>
+        renderActions={() => {
+          return (
+            <View>
+              {image ? (
+                <View style={{backgroundColor:colors.aqua, borderRadius:5 }}>
+                  <Ionicons
+                    name="close-outline"
+                    size={responsiveFontSize(4)}
+                    onPress={() => handleDelImg()}
+                    color={colors.bronze}
+                  />
+                  <Image
+                    source={{uri: image}}
+                    style={{height: 100, width: 150}}></Image>
+                </View>
+              ) : (
+                <View style={{flex: 1,}}>
+                  <Ionicons
+                    color={colors.activeGray}
+                    name="image"
+                    size={responsiveFontSize(4)}
+                    selectionColor="blue"
+                    onPress={() => {
+                      pickImageAndUpload();
+                    }}
+                  />
+                </View>
+              )}
+            </View>
+          );
+        }}
+        renderSend={customSend}></GiftedChat>
+    </SafeAreaView>
   );
 };
 

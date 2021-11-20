@@ -14,8 +14,6 @@ import {
 } from 'react-native-responsive-dimensions';
 
 const header = props => {
-  
-  console.log('checkHeader', props.navigation);
   return (
     <TouchableOpacity
       style={styles.root}
@@ -25,14 +23,12 @@ const header = props => {
             name: 'SettingScreen',
             options: {
               bottomTabs: {
-                visible: false
-              }
-            }
+                visible: false,
+              },
+            },
           },
-          
         });
-      }}
-      >
+      }}>
       <Avatar
         source={{
           uri: props.avatar,

@@ -50,7 +50,7 @@ export const goHome = () => {
           },
           {
             stack: {
-              id: 'SETTING_STACK',
+              id: 'CONTACT_STACK',
               children: [
                 {
                   component: {
@@ -70,7 +70,7 @@ export const goHome = () => {
           },
           {
             stack: {
-              id: 'CONTACT_STACK',
+              id: 'SETTING_STACK',
               children: [
                 {
                   component: {
@@ -79,7 +79,7 @@ export const goHome = () => {
                       bottomTab: {
                         selectedTextColor: '#4ba685',
                         selectedIconColor: '#4ba685',
-                        text: 'Profile',
+                        text: 'Setting',
                         icon: require('../aassets/img/setting.png'),
                       },
                     },

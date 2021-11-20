@@ -25,7 +25,7 @@ import HomeAuth from '../screens/index';
 import {Provider} from 'react-redux';
 import {
   withNavigationProvider,
-  NavigationProvider,
+
 } from 'react-native-navigation-hooks';
 import {Theme} from '../common/theme/theme';
 import BntEditProfile from '../components/header';
@@ -43,7 +43,6 @@ Navigation.setDefaultOptions({
     style: 'dark',
   },
   topBar: {
-    topMargin: 5,
     title: {
       color: 'black',
       alignment: 'center',
@@ -91,7 +90,7 @@ ContactScreen.options = {
 SettingScreen.options = {
   topBar: {
     title: {
-      text: 'Profile',
+      text: 'Setting',
     },
     rightButtons: {
       id: 'btnEdit',
@@ -106,23 +105,23 @@ SearchScreen.options = {
   //   visible: false,
   // },
 };
-ChatView.options =(props)=>{
+
+ChatView.options = (props)=>{
   return{
     topBar: {
+      title: {
+        text: props.title,
+      },
       rightButtons: {
-        id: 'custom',
-        component: {
-          name: 'BntEditProfile',
-          passProps: {
-            name: props.title,
-            avatar: props.avatar,
-            status: props.status,
-            navigation: props.componentId,
-          },
-        },
+        id: 'btnEdit',
+        icon: require('../aassets/img/editTopBar.png'),
+        color: '#4ba685',
       },
     },
-  }}
+  }
+
+}
+
 Login.options = {
   topBar: {
     visible: false,
@@ -214,5 +213,4 @@ export const registerScreens = store => {
     () => BntEditProfile,
   );
 
-  // Navigation.registerComponent('BntEditProfile', () => require('../components/header'));
 };

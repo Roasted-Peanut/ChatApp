@@ -46,6 +46,7 @@ const Register = props => {
   const [address, setAddress] = useState({value: '', error: ''});
   const [loading, setLoading] = useState(false);
   const [allImages, setAllImage] = useState([]);
+
   const getImage = () =>{
     const ref = storage().ref('default')
     ref.list().then((imgResult)=>{
@@ -58,7 +59,7 @@ const Register = props => {
       })
     })
   }
-  console.log("Image",allImages)
+  // console.log("Image",allImages)
   useEffect(()=>{
     getImage()
    

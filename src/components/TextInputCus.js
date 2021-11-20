@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     flex: 1,
     paddingVertical: Platform.OS === 'ios' ? 12 : 8,
+    fontSize: Theme.size.large,
   },
   label: {
     position: 'absolute',
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   textLabel: {
     fontFamily: Theme.fontFamily.QuicksandSemiBold,
     color: Theme.colors.primary,
-    fontSize: Theme.size.small,
+    fontSize: Theme.size.large,
   },
   error: {
     width: '70%',
